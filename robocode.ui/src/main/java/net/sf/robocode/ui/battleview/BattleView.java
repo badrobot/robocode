@@ -563,8 +563,15 @@ public class BattleView extends Canvas {
 				} else {
 					bulletColor = new Color(bulletSnapshot.getColor());
 				}
-				g.setColor(bulletColor);
-				g.fill(bulletArea);
+				if (bulletSnapshot.isHealthPack()){
+					RenderImage healthpackRenderImage = imageManager.getHealthpackImage(0);
+					healthpackRenderImage.setTransform(at);
+					healthpackRenderImage.paint(g);
+				}else {
+					g.setColor(bulletColor);
+					g.fill(bulletArea);
+				}
+
 
 			} else if (drawExplosions) {
 				int explosionIndex = bulletSnapshot.getExplosionImageIndex();

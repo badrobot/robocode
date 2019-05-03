@@ -25,6 +25,7 @@ public interface IBulletSnapshot {
 	 */
 	BulletState getState();
 
+
 	/**
 	 * Returns the bullet power.
 	 *
@@ -106,6 +107,8 @@ public interface IBulletSnapshot {
 	 * @see #getExplosionImageIndex()
 	 */
 	int getExplosionImageIndex();
+
+	boolean isHealthPack();
 
 	/**
 	 * Returns the ID of the bullet used for identifying the bullet in a collection of bullets.

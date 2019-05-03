@@ -32,6 +32,16 @@ import java.nio.ByteBuffer;
  */
 public class Bullet implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private boolean isLandmine = false;
+
+
+	public boolean isLandmine() {
+		return isLandmine;
+	}
+
+	public void setLandmine(boolean landmine) {
+		isLandmine = landmine;
+	}
 
 	private final double headingRadians;
 	private double x;

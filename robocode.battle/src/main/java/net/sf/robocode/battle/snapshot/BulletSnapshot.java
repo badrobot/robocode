@@ -10,6 +10,7 @@ package net.sf.robocode.battle.snapshot;
 
 import net.sf.robocode.battle.peer.BulletPeer;
 import net.sf.robocode.battle.peer.ExplosionPeer;
+import net.sf.robocode.battle.peer.HealthPeer;
 import net.sf.robocode.battle.peer.RobotPeer;
 import net.sf.robocode.peer.ExecCommands;
 import net.sf.robocode.serialization.IXmlSerializable;
@@ -73,6 +74,7 @@ final class BulletSnapshot implements java.io.Serializable, IXmlSerializable, IB
 
 	private double heading;
 
+	private boolean isHealthPack = false;
 	/**
 	 * Creates a snapshot of a bullet that must be filled out with data later.
 	 */
@@ -85,6 +87,15 @@ final class BulletSnapshot implements java.io.Serializable, IXmlSerializable, IB
 		power = Double.NaN;
 	}
 
+	@Override
+	public boolean isHealthPack() {
+		return isHealthPack;
+	}
+
+	public void setHealthPack(boolean healthPack) {
+		isHealthPack = healthPack;
+	}
+
 	/**
 	 * Creates a snapshot of a bullet.
 	 *
@@ -92,6 +103,7 @@ final class BulletSnapshot implements java.io.Serializable, IXmlSerializable, IB
 	 */
 	BulletSnapshot(BulletPeer bullet) {
 		state = bullet.getState();
+		isHealthPack = bullet instanceof HealthPeer;
 
 		power = bullet.getPower();
 

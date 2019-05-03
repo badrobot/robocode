@@ -117,6 +117,11 @@ public class BasicRobotProxy extends HostingRobotProxy implements IBasicRobotPee
 		return setFireImpl(power);
 	}
 
+	public Bullet setSuperFire(double power) {
+		setCall();
+		return setSuperFireImpl(power);
+	}
+
 	// blocking actions
 	public void execute() {
 		executeImpl();
@@ -127,6 +132,12 @@ public class BasicRobotProxy extends HostingRobotProxy implements IBasicRobotPee
 		do {
 			execute(); // Always tick at least once
 		} while (getDistanceRemaining() != 0);
+	}
+
+	public void dropLandMine() {
+		setCall();
+		dropLandMineImpl();
+		execute();
 	}
 
 	public void turnBody(double radians) {
@@ -482,6 +493,31 @@ public class BasicRobotProxy extends HostingRobotProxy implements IBasicRobotPee
 		commands.setMoved(true);
 	}
 
+	private final void dropLandMineImpl() {
+		int power = 500;
+
+		Bullet bullet;
+		BulletCommand wrapper;
+		Event currentTopEvent = eventManager.getCurrentTopEvent();
+
+		nextBulletId++;
+
+		// this is normal bullet
+		bullet = new Bullet(status.getGunHeadingRadians(), getX(), getY(), power, statics.getName(), null, true,
+				nextBulletId);
+		bullet.setLandmine(true);
+		wrapper = new BulletCommand(power, false, 0, nextBulletId);
+		wrapper.setLandMine(true);
+
+
+		firedEnergy += power;
+		firedHeat += Rules.getGunHeat(power);
+
+		commands.getBullets().add(wrapper);
+
+		bullets.put(nextBulletId, bullet);
+	}
+
 	private final Bullet setFireImpl(double power) {
 		if (Double.isNaN(power)) {
 			println("SYSTEM: You cannot call fire(NaN)");
@@ -519,6 +555,52 @@ public class BasicRobotProxy extends HostingRobotProxy implements IBasicRobotPee
 		firedHeat += Rules.getGunHeat(power);
 
 		commands.getBullets().add(wrapper);
+
+		bullets.put(nextBulletId, bullet);
+
+		return bullet;
+	}
+
+	private final Bullet setSuperFireImpl(double power) {
+		if (Double.isNaN(power)) {
+			println("SYSTEM: You cannot call fire(NaN)");
+			return null;
+		}
+		if (getGunHeatImpl() > 0 || getEnergyImpl() == 0) {
+			return null;
+		}
+
+		power = min(getEnergyImpl(), min(max(power, Rules.MIN_BULLET_POWER), Rules.MAX_BULLET_POWER));
+
+		Bullet bullet;
+		BulletCommand wrapper;
+		Event currentTopEvent = eventManager.getCurrentTopEvent();
+
+		nextBulletId++;
+
+		if (currentTopEvent != null && currentTopEvent.getTime() == status.getTime() && !statics.isAdvancedRobot()
+				&& status.getGunHeadingRadians() == status.getRadarHeadingRadians()
+				&& ScannedRobotEvent.class.isAssignableFrom(currentTopEvent.getClass())) {
+			// this is angle assisted bullet
+			ScannedRobotEvent e = (ScannedRobotEvent) currentTopEvent;
+			double fireAssistAngle = Utils.normalAbsoluteAngle(status.getHeadingRadians() + e.getBearingRadians());
+
+			bullet = new Bullet(fireAssistAngle, getX(), getY(), power, statics.getName(), null, true, nextBulletId);
+			wrapper = new BulletCommand(power, true, fireAssistAngle, nextBulletId);
+			wrapper.setSuperBullet(true);
+		} else {
+			// this is normal bullet
+			bullet = new Bullet(status.getGunHeadingRadians(), getX(), getY(), power, statics.getName(), null, true,
+					nextBulletId);
+			wrapper = new BulletCommand(power, false, 0, nextBulletId);
+			wrapper.setSuperBullet(true);
+		}
+
+		firedEnergy += power;
+		firedHeat += Rules.getGunHeat(power);
+
+		commands.getBullets().add(wrapper);
+
 
 		bullets.put(nextBulletId, bullet);
 

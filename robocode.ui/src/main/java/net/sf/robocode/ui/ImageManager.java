@@ -35,6 +35,14 @@ public class ImageManager implements IImageManager {
 	private Image gunImage;
 	private Image radarImage;
 
+	Image healthpackImage;
+
+	@Override
+	public RenderImage getHealthpackImage(Integer color) {
+		Image healthpack = getHealthpackImage().getScaledInstance(1, 1, 0);
+		return new RenderImage(healthpack);
+	}
+
 	private static final int MAX_NUM_COLORS = 256;
 
 	private HashMap<Integer, RenderImage> robotBodyImageCache;
@@ -59,6 +67,7 @@ public class ImageManager implements IImageManager {
 		robotGunImageCache = new RenderCache<Integer, RenderImage>();
 		robotRadarImageCache = new RenderCache<Integer, RenderImage>();
 
+		getHealthpackImage();
 		// Read images into the cache
 		getBodyImage();
 		getGunImage();
@@ -151,6 +160,13 @@ public class ImageManager implements IImageManager {
 			gunImage = getImage("/net/sf/robocode/ui/images/turret.png");
 		}
 		return gunImage;
+	}
+
+	private Image getHealthpackImage() {
+		if (healthpackImage == null) {
+			healthpackImage = getImage("/net/sf/robocode/ui/images/health_pack.png");
+		}
+		return healthpackImage;
 	}
 
 	/**

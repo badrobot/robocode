@@ -42,6 +42,7 @@ public interface IBasicRobotPeer {
 	 */
 	String getName();
 
+
 	/**
 	 * Returns the game time of the current round, where the time is equal to
 	 * the current turn in the round.
@@ -252,6 +253,8 @@ public interface IBasicRobotPeer {
 	 * @see #getRadarTurnRemaining()
 	 */
 	double getBodyTurnRemaining();
+
+	void dropLandMine();
 
 	/**
 	 * Returns the angle remaining in the gun's turn, in radians.
@@ -513,6 +516,8 @@ public interface IBasicRobotPeer {
 	 *      onBulletMissed(BulletMissedEvent)
 	 */
 	Bullet setFire(double power);
+
+	Bullet setSuperFire(double power);
 
 	/**
 	 * Sets the color of the robot's body.

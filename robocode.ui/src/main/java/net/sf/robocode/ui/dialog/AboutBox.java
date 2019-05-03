@@ -120,7 +120,7 @@ public final class AboutBox extends JDialog {
 		transparentURL = AboutBox.class.getResource("/net/sf/robocode/ui/html/transparent.png");
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setTitle("About Robocode");
+		setTitle("About Steve");
 		setContentPane(getAboutBoxContentPane());
 		setResizable(false);
 	}

@@ -28,6 +28,16 @@ import java.util.List;
  */
 public class BulletPeer {
 
+	private boolean isStatic = true;
+
+	public boolean isStatic() {
+		return isStatic;
+	}
+
+	public void setStatic(boolean staticVar) {
+		isStatic = staticVar;
+	}
+
 	private static final int EXPLOSION_LENGTH = 17;
 
 	private static final int RADIUS = 3;
@@ -46,19 +56,19 @@ public class BulletPeer {
 	protected double x;
 	protected double y;
 
-	private double lastX;
-	private double lastY;
+	protected double lastX;
+	protected double lastY;
 
 	protected double power;
 
-	private double deltaX;
-	private double deltaY;
+	protected double deltaX;
+	protected double deltaY;
 
-	private final Line2D.Double boundingLine = new Line2D.Double();
+	protected final Line2D.Double boundingLine = new Line2D.Double();
 
 	protected int frame; // Do not set to -1
 
-	private final int color;
+	protected int color;
 
 	protected int explosionImageIndex; // Do not set to -1
 
@@ -136,7 +146,7 @@ public class BulletPeer {
 		return (ua >= 0 && ua <= 1) && (ub >= 0 && ub <= 1);
 	}
 
-	private void checkRobotCollision(List<RobotPeer> robots) {
+	protected void checkRobotCollision(List<RobotPeer> robots) {
 		for (RobotPeer otherRobot : robots) {
 			if (!(otherRobot == null || otherRobot == owner || otherRobot.isDead())
 					&& otherRobot.getBoundingBox().intersectsLine(boundingLine)) {
@@ -345,6 +355,13 @@ public class BulletPeer {
 	}
 
 	private void updateMovement() {
+		if (isStatic) {
+			lastX = x;
+			lastY = y;
+			boundingLine.setLine(lastX, lastY, x, y);
+			return;
+		}
+
 		lastX = x;
 		lastY = y;
 

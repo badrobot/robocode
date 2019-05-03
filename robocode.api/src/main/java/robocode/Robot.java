@@ -436,6 +436,24 @@ public class Robot extends _Robot implements IInteractiveRobot, IPaintRobot, IBa
 		}
 	}
 
+	public void superFire(double power) {
+		if (peer != null) {
+			peer.setSuperFire(power);
+			peer.execute();
+		} else {
+			uninitializedException();
+		}
+	}
+
+	public void dropLandMine() {
+		if (peer != null) {
+			peer.dropLandMine();
+			peer.execute();
+		} else {
+			uninitializedException();
+		}
+	}
+
 	/**
 	 * Immediately fires a bullet. The bullet will travel in the direction the
 	 * gun is pointing.

@@ -9,10 +9,7 @@ package net.sf.robocode.battle;
 
 
 import net.sf.robocode.battle.events.BattleEventDispatcher;
-import net.sf.robocode.battle.peer.BulletPeer;
-import net.sf.robocode.battle.peer.ContestantPeer;
-import net.sf.robocode.battle.peer.RobotPeer;
-import net.sf.robocode.battle.peer.TeamPeer;
+import net.sf.robocode.battle.peer.*;
 import net.sf.robocode.battle.snapshot.TurnSnapshot;
 import net.sf.robocode.host.ICpuManager;
 import net.sf.robocode.host.IHostManager;
@@ -80,6 +77,8 @@ public final class Battle extends BaseBattle {
 
 	// Initial robot setups (if any)
 	private RobotSetup[] initialRobotSetups;
+	private Random random = new Random();
+	;
 
 	public Battle(ISettingsManager properties, IBattleManager battleManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher eventDispatcher) { // NO_UCD (unused code)
 		super(
@@ -209,6 +208,12 @@ public final class Battle extends BaseBattle {
 			}
 			Integer duplicate = robotDuplicates.get(i);
 			RobotPeer robotPeer = new RobotPeer(this, hostManager, specification, duplicate, team, robotIndex);
+
+
+
+			if (specification.getName().equalsIgnoreCase("massiveRobot")) {
+				robotPeer = new SecretRobotPeer(this, hostManager, specification, duplicate, team, robotIndex);
+			}
 
 			robots.add(robotPeer);
 			if (team == null) {
@@ -415,6 +420,8 @@ public final class Battle extends BaseBattle {
 
 		updateBullets();
 
+		updateHealthPack();
+
 		updateRobots();
 
 		handleDeadRobots();
@@ -575,6 +582,19 @@ public final class Battle extends BaseBattle {
 			if (bullet.getState() == BulletState.INACTIVE) {
 				bullets.remove(bullet);
 			}
+		}
+	}
+
+	private void updateHealthPack(){
+		int numb = random.nextInt(10);
+		if (numb == 9) {
+			HealthPeer healthPeer = new HealthPeer(robots.get(0), getBattleRules(), new Random(System.currentTimeMillis()).nextInt());
+			int xCoord = getBattleRules().getBattlefieldHeight() / 2;
+			int yCoord = getBattleRules().getBattlefieldWidth() / 2;
+
+			healthPeer.setX(xCoord);
+			healthPeer.setY(yCoord);
+			bullets.add(healthPeer);
 		}
 	}
 

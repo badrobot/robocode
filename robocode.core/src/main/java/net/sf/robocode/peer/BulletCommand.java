@@ -32,6 +32,24 @@ public class BulletCommand implements Serializable {
 	private final boolean fireAssistValid;
 	private final double fireAssistAngle;
 	private final int bulletId;
+	private boolean isSuperBullet;
+	private boolean isLandMine;
+
+	public boolean isLandMine() {
+		return isLandMine;
+	}
+
+	public void setLandMine(boolean landMine) {
+		isLandMine = landMine;
+	}
+
+	public boolean isSuperBullet() {
+		return isSuperBullet;
+	}
+
+	public void setSuperBullet(boolean superBullet) {
+		isSuperBullet = superBullet;
+	}
 
 	public boolean isFireAssistValid() {
 		return fireAssistValid;

@@ -62,8 +62,11 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author "Positive" (contributor)
  * @author "BD123" (contributor)
  */
-public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
+public class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
+	protected int myWidth;
+	protected int myHeight;
+	
 	public static final int
 			WIDTH = 36,
 			HEIGHT = 36;
@@ -138,8 +141,17 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 	private final BoundingRectangle boundingBox;
 	private final RbSerializer rbSerializer;
 
+	public RobotPeer(int width, int height, Battle battle, IHostManager hostManager, RobotSpecification robotSpecification, int duplicate, TeamPeer team, int robotIndex) {
+		this(battle, hostManager, robotSpecification, duplicate, team, robotIndex);
+		myHeight = height;
+		myWidth = width;
+	}
+
 	public RobotPeer(Battle battle, IHostManager hostManager, RobotSpecification robotSpecification, int duplicate, TeamPeer team, int robotIndex) {
 		super();
+
+		myHeight = RobotPeer.HEIGHT;
+		myHeight = RobotPeer.WIDTH;
 
 		this.battle = battle;
 		this.robotSpecification = robotSpecification;
@@ -673,15 +685,15 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		if (!valid) {
 			final Random random = RandomFactory.getRandom();
 
-			double maxWidth = battleRules.getBattlefieldWidth() - RobotPeer.WIDTH;
-			double maxHeight = battleRules.getBattlefieldHeight() - RobotPeer.HEIGHT;
+			double maxWidth = battleRules.getBattlefieldWidth() - myWidth;
+			double maxHeight = battleRules.getBattlefieldHeight() - myHeight;
 
-			double halfRobotWidth = RobotPeer.WIDTH / 2;
-			double halfRobotHeight = RobotPeer.HEIGHT / 2;
+			double halfRobotWidth = myWidth / 2;
+			double halfRobotHeight = myHeight / 2;
 
 			int sentryBorderSize = battle.getBattleRules().getSentryBorderSize();
-			int sentryBorderMoveWidth = sentryBorderSize - RobotPeer.WIDTH;
-			int sentryBorderMoveHeight = sentryBorderSize - RobotPeer.HEIGHT;
+			int sentryBorderMoveWidth = sentryBorderSize - myWidth;
+			int sentryBorderMoveHeight = sentryBorderSize - myHeight;
 
 			for (int j = 0; j < 1000; j++) {
 				double rndX = random.nextDouble();
@@ -704,11 +716,11 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 						int safeZoneWidth = battleRules.getBattlefieldWidth() - 2 * sentryBorderSize;
 						int safeZoneHeight = battleRules.getBattlefieldHeight() - 2 * sentryBorderSize;
 
-						x = sentryBorderSize + RobotPeer.WIDTH + rndX * (safeZoneWidth - 2 * RobotPeer.WIDTH);
-						y = sentryBorderSize + RobotPeer.HEIGHT + rndY * (safeZoneHeight - 2 * RobotPeer.HEIGHT);
+						x = sentryBorderSize + myWidth + rndX * (safeZoneWidth - 2 * myWidth);
+						y = sentryBorderSize + myHeight + rndY * (safeZoneHeight - 2 * myHeight);
 					} else {				
-						x = RobotPeer.WIDTH + rndX * (battleRules.getBattlefieldWidth() - 2 * RobotPeer.WIDTH);
-						y = RobotPeer.HEIGHT + rndY * (battleRules.getBattlefieldHeight() - 2 * RobotPeer.HEIGHT);
+						x = myWidth + rndX * (battleRules.getBattlefieldWidth() - 2 * myWidth);
+						y = myHeight + rndY * (battleRules.getBattlefieldHeight() - 2 * myHeight);
 					}
 				}
 
@@ -857,13 +869,24 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 			double firePower = min(energy,
 					min(max(bulletCmd.getPower(), Rules.MIN_BULLET_POWER), Rules.MAX_BULLET_POWER));
 
-			updateEnergy(-firePower);
-
-			gunHeat += Rules.getGunHeat(firePower);
+//			if (!bulletCmd.isSuperBullet() || !bulletCmd.isLandMine()) {
+//				updateEnergy(-firePower);
+//				gunHeat += Rules.getGunHeat(firePower);
+//			}
 
 			newBullet = new BulletPeer(this, battleRules, bulletCmd.getBulletId());
 
+
 			newBullet.setPower(firePower);
+
+			if (bulletCmd.isSuperBullet()) {
+				newBullet.setPower(500);
+			}
+			if (bulletCmd.isLandMine()) {
+				newBullet.setStatic(true);
+				newBullet.setPower(500);
+			}
+
 			if (!turnedRadarWithGun || !bulletCmd.isFireAssistValid() || statics.isAdvancedRobot()) {
 				newBullet.setHeading(gunHeading);
 			} else {
